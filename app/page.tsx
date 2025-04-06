@@ -21,7 +21,6 @@ interface ErrorResponse {
 
 // Helper function to fetch files from our API endpoint
 async function getFiles(): Promise<R2File[]> {
-  console.log('Fetching files from /api/files');
   try {
     const apiUrl =
       process.env.NODE_ENV === 'production'
@@ -50,7 +49,6 @@ async function getFiles(): Promise<R2File[]> {
 
     // Parse successful response
     const data: FileListResponse = await res.json();
-    console.log('Successfully fetched files:', data.files?.length || 0);
     return data.files || []; // Return files array or empty array
   } catch (error) {
     console.error('Error in getFiles function:', error);

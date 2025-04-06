@@ -13,7 +13,6 @@ export default function FileUploader() {
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleUploadSuccess = () => {
-    console.log('Upload successful, refreshing page...');
     // Refresh the current route to fetch the updated file list
     // This keeps the client state (like scroll position)
     router.refresh();

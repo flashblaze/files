@@ -42,11 +42,9 @@ interface R2Bucket {
 
 
 export async function GET(_request: NextRequest) {
-    console.log("Received GET request for files");
     const cloudflareContext = getCloudflareContext();
     const R2 = cloudflareContext?.env?.R2_BUCKET as R2Bucket | undefined;
 
-    console.log("R2 Binding for list:", R2 ? "Found" : "Not Found");
 
     if (!R2) {
         console.error("R2_BUCKET binding not found for listing.");
@@ -54,11 +52,9 @@ export async function GET(_request: NextRequest) {
     }
 
     try {
-        console.log("Attempting to list objects from R2...");
         // Fetch objects including their HTTP metadata to get content type
         const listed = await R2.list({ include: ['httpMetadata'] });
 
-        console.log(`Found ${listed.objects.length} objects. Truncated: ${listed.truncated}`);
 
         const files = listed.objects.map(obj => ({
             name: obj.key,

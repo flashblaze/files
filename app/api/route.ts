@@ -29,13 +29,10 @@ interface R2Object {
 }
 
 export async function POST(request: NextRequest) {
-    console.log("Received POST request");
     const cloudflareContext = getCloudflareContext();
     // Use type assertion for the R2 binding
     const R2 = cloudflareContext?.env?.R2_BUCKET as R2Bucket | undefined;
 
-    // console.log("Cloudflare context:", cloudflareContext);
-    console.log("R2 Binding:", R2 ? "Found" : "Not Found");
 
     if (!R2) {
         console.error("R2_BUCKET binding not found.");
@@ -44,7 +41,6 @@ export async function POST(request: NextRequest) {
 
     try {
         const formData = await request.formData();
-        // console.log("Received FormData:", formData);
         const file = formData.get("file") as File | null;
 
         if (!file) {
@@ -52,19 +48,16 @@ export async function POST(request: NextRequest) {
             return Response.json({ error: "No file uploaded" }, { status: 400 });
         }
 
-        console.log("File received:", file.name, file.size, file.type);
 
         // --- Actual R2 Upload Logic ---
         const fileKey = file.name; // Use filename as the key, consider adding prefix/UUID for uniqueness
         const fileBuffer = await file.arrayBuffer();
 
-        console.log(`Attempting to upload ${fileKey} (${fileBuffer.byteLength} bytes) to R2...`);
 
         const uploadedObject = await R2.put(fileKey, fileBuffer, {
             httpMetadata: { contentType: file.type },
         });
 
-        console.log(`Successfully uploaded ${fileKey} to R2. ETag: ${uploadedObject.httpEtag}`);
 
         return Response.json({ success: true, fileName: file.name, etag: uploadedObject.httpEtag });
 

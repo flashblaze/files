@@ -77,7 +77,6 @@ export default function FileCard({ file }: FileCardProps) {
   };
 
   const handleConfirmDelete = async () => {
-    console.log(`Attempting to delete file via API: ${file.name}`);
     try {
       const response = await fetch(`/api/files/${encodeURIComponent(file.name)}`, {
         method: 'DELETE',
@@ -91,7 +90,6 @@ export default function FileCard({ file }: FileCardProps) {
         throw new Error(result.error || 'Failed to delete file from API.');
       }
 
-      console.log(`Successfully deleted ${result.deletedFile || file.name}, refreshing...`);
       setIsDeleteModalOpen(false); // Close modal on success
       router.refresh(); // Refresh page to update file list
     } catch (error) {
