@@ -7,17 +7,20 @@ interface R2Bucket {
     // Add other methods like list, put, get if needed in this context
 }
 
+// Use 'any' for the second argument type as a workaround
 export async function DELETE(
     _request: NextRequest,
-    { params }: { params: { filename: string } }
+    context: any // Type context as 'any'
 ) {
-    const { filename } = params;
+    // Runtime check for params and filename
+    const params = context?.params;
+    const filename = params?.filename as string | undefined;
 
-    if (!filename) {
-        return Response.json({ error: "Filename parameter is missing" }, { status: 400 });
+    if (!filename || typeof filename !== 'string') {
+        console.error("Invalid or missing filename parameter in context:", context);
+        return Response.json({ error: "Invalid filename parameter" }, { status: 400 });
     }
 
-    // Decode the filename in case it contains URI-encoded characters
     const decodedFilename = decodeURIComponent(filename);
 
     console.log(`Received DELETE request for file: ${decodedFilename}`);
@@ -31,7 +34,9 @@ export async function DELETE(
     }
 
     try {
+        console.log(`Attempting to delete ${decodedFilename} from R2...`);
         await R2.delete(decodedFilename);
+        console.log(`Successfully deleted ${decodedFilename} from R2.`);
         return Response.json({ success: true, deletedFile: decodedFilename });
 
     } catch (error) {

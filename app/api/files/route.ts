@@ -42,31 +42,39 @@ interface R2Bucket {
 
 
 export async function GET(_request: NextRequest) {
+    console.log("API ROUTE: Received GET request for files"); // Identify log source
     const cloudflareContext = getCloudflareContext();
     const R2 = cloudflareContext?.env?.R2_BUCKET as R2Bucket | undefined;
 
+    console.log("API ROUTE: R2 Binding found:", !!R2); // Log boolean check
 
     if (!R2) {
-        console.error("R2_BUCKET binding not found for listing.");
+        console.error("API ROUTE: R2_BUCKET binding not found.");
         return Response.json({ error: "R2 bucket not configured" }, { status: 500 });
     }
 
     try {
-        // Fetch objects including their HTTP metadata to get content type
+        console.log("API ROUTE: Attempting R2 list operation...");
         const listed = await R2.list({ include: ['httpMetadata'] });
-
+        console.log(`API ROUTE: R2 list operation successful. Objects found: ${listed.objects.length}, Truncated: ${listed.truncated}`);
 
         const files = listed.objects.map(obj => ({
             name: obj.key,
-            type: obj.httpMetadata?.contentType || 'unknown', // Extract content type
+            type: obj.httpMetadata?.contentType || 'unknown',
             size: obj.size,
-            uploaded: obj.uploaded,
+            uploaded: obj.uploaded?.toISOString(), // Ensure date is serializable
         }));
+
+        // Log first few file names if successful
+        if (files.length > 0) {
+            console.log("API ROUTE: Sample files returned:", files.slice(0, 3).map(f => f.name));
+        }
 
         return Response.json({ files });
 
     } catch (error) {
-        console.error("Error listing files from R2:", error);
+        // Log the specific error from R2.list()
+        console.error("API ROUTE: Error during R2 list operation:", error);
         const errorMessage = error instanceof Error ? error.message : "Failed to list files";
         return Response.json({ error: errorMessage }, { status: 500 });
     }

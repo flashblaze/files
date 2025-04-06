@@ -21,38 +21,48 @@ interface ErrorResponse {
 
 // Helper function to fetch files from our API endpoint
 async function getFiles(): Promise<R2File[]> {
+  console.log('Attempting to fetch files...');
   try {
     const apiUrl =
       process.env.NODE_ENV === 'production'
-        ? 'YOUR_PRODUCTION_URL/api/files' // IMPORTANT: Replace with your actual production URL
+        ? 'YOUR_PRODUCTION_URL/api/files' // IMPORTANT: Ensure this is correct!
         : 'http://localhost:3000/api/files';
+    console.log(`Using API URL: ${apiUrl}`); // Log the URL being used
 
     const res = await fetch(apiUrl, {
       method: 'GET',
       cache: 'no-store',
     });
 
-    // Check response status before parsing JSON
+    console.log(`Fetch response status: ${res.status}, OK: ${res.ok}`); // Log response status
+
     if (!res.ok) {
-      let errorMessage = 'Failed to fetch files';
+      let errorBody = '';
+      let errorMessage = `API Error ${res.status}: ${res.statusText}`;
       try {
-        // Try to parse error message from response body
-        const errorData: ErrorResponse = await res.json();
+        errorBody = await res.text(); // Try to get raw error body
+        console.error(`API Error Response Body: ${errorBody}`);
+        const errorData: ErrorResponse = JSON.parse(errorBody);
         errorMessage = errorData.error || `API Error: ${res.statusText}`;
       } catch (parseError) {
-        // Fallback if parsing JSON fails
+        errorMessage = `API Error ${res.status}: ${res.statusText}. Body: ${errorBody || '(could not read body)'}`;
         console.error('Failed to parse error response:', parseError);
       }
       console.error('API Error fetching files:', errorMessage);
       throw new Error(errorMessage);
     }
 
-    // Parse successful response
-    const data: FileListResponse = await res.json();
-    return data.files || []; // Return files array or empty array
+    // Try getting raw text first for successful responses too, for debugging
+    const rawBody = await res.text();
+    console.log('API Success Response Body (raw):', rawBody.substring(0, 500)); // Log first 500 chars
+
+    const data: FileListResponse = JSON.parse(rawBody); // Parse the raw text
+    console.log('Successfully parsed files data. Count:', data.files?.length || 0);
+    return data.files || [];
   } catch (error) {
-    console.error('Error in getFiles function:', error);
-    return []; // Return empty array on any error
+    // Log the specific error caught during fetch/processing
+    console.error('Error caught in getFiles function:', error);
+    return [];
   }
 }
 
