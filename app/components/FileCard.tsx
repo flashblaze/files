@@ -113,6 +113,19 @@ export default function FileCard({ file }: FileCardProps) {
       });
   }, 300); // 300ms debounce time
 
+  const copyFileURL = debounce(() => {
+    navigator.clipboard
+      .writeText(`${process.env.NEXT_PUBLIC_R2_URL}/${file.name}`)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000); // Reset icon after 2 seconds
+      })
+      .catch((err) => {
+        console.error('Failed to copy file URL: ', err);
+        // Optionally show an error message to the user
+      });
+  }, 300); // 300ms debounce time
+
   return (
     <>
       <div className="relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
@@ -146,7 +159,7 @@ export default function FileCard({ file }: FileCardProps) {
           {/* Placeholder for Share button - currently copies filename */}
           <button
             type="button"
-            onClick={copyFileName} // Using copy for now
+            onClick={copyFileURL} // Using copy for now
             title="Share file (copies filename)"
             className="rounded p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
           >

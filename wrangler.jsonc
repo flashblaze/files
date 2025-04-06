@@ -27,7 +27,8 @@
     }
   ],
   "vars": {
-    "NEXT_PUBLIC_URL": "https://files.flashblaze.dev"
+    "NEXT_PUBLIC_URL": "https://files.flashblaze.dev",
+    "NEXT_PUBLIC_R2_URL": "https://media.flashblaze.dev"
   }
 
   /**

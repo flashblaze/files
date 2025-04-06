@@ -23,7 +23,6 @@ export async function DELETE(
 
     const decodedFilename = decodeURIComponent(filename);
 
-    console.log(`Received DELETE request for file: ${decodedFilename}`);
 
     const cloudflareContext = getCloudflareContext();
     const R2 = cloudflareContext?.env?.R2_BUCKET as R2Bucket | undefined;
@@ -34,9 +33,7 @@ export async function DELETE(
     }
 
     try {
-        console.log(`Attempting to delete ${decodedFilename} from R2...`);
         await R2.delete(decodedFilename);
-        console.log(`Successfully deleted ${decodedFilename} from R2.`);
         return Response.json({ success: true, deletedFile: decodedFilename });
 
     } catch (error) {
