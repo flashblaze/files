@@ -7,13 +7,10 @@ interface R2Bucket {
     // Add other methods like list, put, get if needed in this context
 }
 
-interface RouteParams {
-    params: {
-        filename: string;
-    };
-}
-
-export async function DELETE(_request: NextRequest, { params }: RouteParams) {
+export async function DELETE(
+    _request: NextRequest,
+    { params }: { params: { filename: string } }
+) {
     const { filename } = params;
 
     if (!filename) {
@@ -23,10 +20,10 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     // Decode the filename in case it contains URI-encoded characters
     const decodedFilename = decodeURIComponent(filename);
 
+    console.log(`Received DELETE request for file: ${decodedFilename}`);
 
     const cloudflareContext = getCloudflareContext();
     const R2 = cloudflareContext?.env?.R2_BUCKET as R2Bucket | undefined;
-
 
     if (!R2) {
         console.error(`R2_BUCKET binding not found for deleting ${decodedFilename}.`);
