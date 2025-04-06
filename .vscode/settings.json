@@ -1,5 +1,14 @@
 {
-	"files.associations": {
-		"wrangler.json": "jsonc"
-	}
+  "files.associations": {
+    "wrangler.json": "jsonc"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "biomejs.biome",
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  //   https://github.com/biomejs/biome/pull/1362#issuecomment-2409104140
+  "editor.codeActionsOnSave": {
+    "quickfix.biome": "explicit"
+  }
 }
