@@ -1,7 +1,7 @@
-import FileUploader from './components/FileUploader';
-import FileCard from './components/FileCard';
 // Import the shared function and the specific type it returns
-import { listFilesFromR2, type R2ListedFile } from '../lib/r2-actions'; // Adjust path
+import { type R2ListedFile, listFilesFromR2 } from '../lib/r2-actions'; // Adjust path
+import FileCard from './components/FileCard';
+import FileUploader from './components/FileUploader';
 
 // Remove R2File interface if it's identical to R2ListedFile
 // interface R2File { ... }
@@ -25,6 +25,8 @@ async function getFilesDirectly(): Promise<R2ListedFile[]> {
 export default async function HomePage() {
   // Call the direct function instead of the one using fetch
   const files = await getFilesDirectly();
+
+  console.log(process.env.NEXT_PUBLIC_R2_URL, 'NEXT_PUBLIC_R2_URL');
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
