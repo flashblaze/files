@@ -1,7 +1,18 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import { AlertTriangle, Loader } from 'lucide-react'; // Use Lucide icons
+import { useEffect, useState } from 'react';
 
 interface DeleteModalProps {
   isOpen: boolean;
@@ -18,7 +29,6 @@ export default function DeleteConfirmationModal({
 }: DeleteModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
 
   // Reset state when modal opens or closes
   useEffect(() => {
@@ -27,26 +37,9 @@ export default function DeleteConfirmationModal({
       setTimeout(() => {
         setIsDeleting(false);
         setDeleteError(null);
-      }, 300);
+      }, 300); // Match default animation duration
     }
   }, [isOpen]);
-
-  // Handle clicks outside the modal to close it (only if not deleting)
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!isDeleting && modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        onClose();
-      }
-    };
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen, onClose, isDeleting]);
 
   const handleConfirmClick = async () => {
     setIsDeleting(true);
@@ -59,54 +52,45 @@ export default function DeleteConfirmationModal({
       setDeleteError(error instanceof Error ? error.message : 'Failed to delete file.');
       setIsDeleting(false); // Re-enable buttons on error
     }
-    // Do not set isDeleting to false on success, let parent handle close
+    // Do not set isDeleting to false on success, AlertDialog handles close
   };
 
-  if (!isOpen) return null;
-
+  // Use AlertDialog open prop controlled by isOpen
+  // Use onOpenChange prop to call onClose when dismissed
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)] backdrop-blur-sm">
-      <div ref={modalRef} className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-        <div className="flex items-start space-x-4">
-          <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-            <AlertTriangle className="h-6 w-6 text-red-600" aria-hidden="true" />
-          </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 text-lg leading-6" id="modal-title">
-              Delete File
-            </h3>
-            <div className="mt-2">
-              <p className="text-gray-500 text-sm">
-                Are you sure you want to delete the file{' '}
-                <strong className="break-all">{fileName || 'this file'}</strong>? This action cannot
-                be undone.
-              </p>
-            </div>
+    <AlertDialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center">
+            <AlertTriangle className="mr-2 h-5 w-5 text-red-600" aria-hidden="true" />
+            Delete File
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete the file{' '}
+            <strong className="break-all">{fileName || 'this file'}</strong>? This action cannot be
+            undone.
             {deleteError && <p className="mt-2 text-red-600 text-sm">Error: {deleteError}</p>}
-          </div>
-        </div>
-        <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse sm:space-x-2 sm:space-x-reverse">
-          <button
-            type="button"
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isDeleting} onClick={onClose}>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            asChild // Use asChild to render the custom Button
             disabled={isDeleting}
             onClick={handleConfirmClick}
-            className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 font-semibold text-sm text-white shadow-sm hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            className="bg-red-600 hover:bg-red-500" // Keep destructive styling
           >
-            {isDeleting ? (
-              <Loader className="-ml-1 mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
-            ) : null}
-            {isDeleting ? 'Deleting...' : 'Delete'}
-          </button>
-          <button
-            type="button"
-            disabled={isDeleting} // Also disable cancel while deleting
-            onClick={onClose}
-            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 font-semibold text-gray-900 text-sm shadow-sm ring-1 ring-gray-300 ring-inset hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:mt-0 sm:w-auto"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
+            <Button disabled={isDeleting} variant="destructive">
+              {isDeleting ? (
+                <Loader className="-mr-1 ml-2 h-5 w-5 animate-spin" aria-hidden="true" />
+              ) : null}
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </Button>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

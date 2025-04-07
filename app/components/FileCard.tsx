@@ -1,31 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import dayjs from 'dayjs';
+import { Check, Copy, Share2, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Share2, Trash2, Copy, Check } from 'lucide-react'; // Import icons
+import { useState } from 'react';
+import { toast } from 'sonner';
+
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 
-// Define the expected shape of a file object passed as prop
 interface R2File {
   name: string;
   type: string;
   size: number;
-  uploaded: string; // Raw date string from API
+  uploaded: string;
 }
 
-// Update FileCardProps: remove formatBytes and formatDate
 interface FileCardProps {
   file: R2File;
 }
 
-// Define type for DELETE API response
 interface DeleteApiResponse {
   success: boolean;
   deletedFile?: string;
   error?: string;
 }
 
-// Simple debounce function
 function debounce<T extends (...args: any[]) => void>(
   func: T,
   wait: number
@@ -43,7 +51,6 @@ function debounce<T extends (...args: any[]) => void>(
   };
 }
 
-// Move helper functions here
 function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
@@ -53,20 +60,11 @@ function formatBytes(bytes: number, decimals = 2): string {
   return `${Number.parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
 }
 
-function formatDate(dateString: string): string {
-  try {
-    // Use default locale formatting
-    return new Date(dateString).toLocaleString();
-  } catch (_error) {
-    console.warn(`Failed to parse date string: ${dateString}`);
-    return 'Invalid Date';
-  }
-}
-
 export default function FileCard({ file }: FileCardProps) {
   const router = useRouter();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [urlCopied, setUrlCopied] = useState(false);
 
   const handleDeleteClick = () => {
     setIsDeleteModalOpen(true);
@@ -82,101 +80,105 @@ export default function FileCard({ file }: FileCardProps) {
         method: 'DELETE',
       });
 
-      // Add type assertion for the response JSON
       const result: DeleteApiResponse = await response.json();
 
       if (!response.ok || !result.success) {
-        // Use the error from the API response if available
         throw new Error(result.error || 'Failed to delete file from API.');
       }
 
-      setIsDeleteModalOpen(false); // Close modal on success
-      router.refresh(); // Refresh page to update file list
+      setIsDeleteModalOpen(false);
+      router.refresh();
     } catch (error) {
       console.error('Error confirming delete:', error);
-      // Re-throw the error to be caught and displayed by the modal
       throw error;
     }
   };
 
-  // Debounced copy function
   const copyFileName = debounce(() => {
     navigator.clipboard
       .writeText(file.name)
       .then(() => {
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000); // Reset icon after 2 seconds
+        toast.success('File name copied to clipboard');
+        setTimeout(() => setCopied(false), 2000);
       })
       .catch((err) => {
         console.error('Failed to copy filename: ', err);
-        // Optionally show an error message to the user
+        toast.error('Failed to copy filename');
       });
-  }, 300); // 300ms debounce time
+  }, 300);
 
   const copyFileURL = debounce(() => {
+    const urlToCopy = `${process.env.NEXT_PUBLIC_R2_URL}/${file.name}`;
     navigator.clipboard
-      .writeText(`${process.env.NEXT_PUBLIC_R2_URL}/${file.name}`)
+      .writeText(urlToCopy)
       .then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000); // Reset icon after 2 seconds
+        setUrlCopied(true);
+        toast.success('File URL copied to clipboard');
+        setTimeout(() => {
+          setUrlCopied(false);
+        }, 2000);
       })
       .catch((err) => {
         console.error('Failed to copy file URL: ', err);
-        // Optionally show an error message to the user
+        toast.error('Failed to copy file URL');
       });
-  }, 300); // 300ms debounce time
+  }, 300);
+
+  const formattedDate = dayjs(file.uploaded).format('ddd, MMM D h:mm A');
 
   return (
     <>
-      <div className="relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
-        <div className="flex-grow">
-          <p className="truncate font-semibold text-gray-800 text-lg" title={file.name}>
+      <Card className="flex flex-col overflow-hidden">
+        <CardHeader className="pb-2">
+          <CardTitle className="truncate text-lg" title={file.name}>
             {file.name}
+          </CardTitle>
+          <CardDescription>
+            Type: <span className="font-medium text-foreground">{file.type}</span>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex-grow py-2">
+          <p className="text-muted-foreground text-sm">
+            Size: <span className="font-medium text-foreground">{formatBytes(file.size)}</span>
           </p>
-          <p className="mt-1 text-gray-500 text-sm">
-            Type: <span className="text-gray-700">{file.type}</span>
+          <p className="text-muted-foreground text-sm">
+            Uploaded: <span className="font-medium text-foreground">{formattedDate}</span>
           </p>
-          {/* Call the local formatBytes function */}
-          <p className="mt-1 text-gray-500 text-sm">
-            Size: <span className="text-gray-700">{formatBytes(file.size)}</span>
-          </p>
-          {/* Call the local formatDate function */}
-          <p className="mt-1 text-gray-500 text-sm">
-            Uploaded: <span className="text-gray-700">{formatDate(file.uploaded)}</span>
-          </p>
-        </div>
-        {/* Action Buttons */}
-        <div className="mt-4 flex justify-end space-x-2 border-gray-100 border-t pt-3">
-          <button
-            type="button"
+        </CardContent>
+        <CardFooter className="flex justify-end space-x-1 pt-2">
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={copyFileName}
             title="Copy filename"
-            className="rounded p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+            className="h-8 w-8"
           >
-            {copied ? <Check size={18} className="text-green-600" /> : <Copy size={18} />}
+            {copied ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}
             <span className="sr-only">Copy filename</span>
-          </button>
-          {/* Placeholder for Share button - currently copies filename */}
-          <button
-            type="button"
-            onClick={copyFileURL} // Using copy for now
-            title="Share file (copies filename)"
-            className="rounded p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={copyFileURL}
+            title="Share file (copies URL)"
+            className="h-8 w-8"
           >
-            <Share2 size={18} />
+            {urlCopied ? <Check size={16} className="text-green-600" /> : <Share2 size={16} />}
             <span className="sr-only">Share file</span>
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="destructive"
+            size="icon"
             onClick={handleDeleteClick}
             title="Delete file"
-            className="rounded p-1.5 text-red-500 transition hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
+            className="h-8 w-8"
           >
-            <Trash2 size={18} />
+            <Trash2 size={16} />
             <span className="sr-only">Delete file</span>
-          </button>
-        </div>
-      </div>
+          </Button>
+        </CardFooter>
+      </Card>
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal

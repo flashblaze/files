@@ -1,32 +1,19 @@
-// Import the shared function and the specific type it returns
-import { type R2ListedFile, listFilesFromR2 } from '../lib/r2-actions'; // Adjust path
+import { type R2ListedFile, listFilesFromR2 } from '../lib/r2-actions';
 import FileCard from './components/FileCard';
 import FileUploader from './components/FileUploader';
 
-// Remove R2File interface if it's identical to R2ListedFile
-// interface R2File { ... }
-
-// Remove FileListResponse and ErrorResponse if no longer needed here
-// interface FileListResponse { ... }
-// interface ErrorResponse { ... }
-
-// Rename or modify getFiles to directly call the shared server action
 async function getFilesDirectly(): Promise<R2ListedFile[]> {
   try {
     const files = await listFilesFromR2();
     return files;
   } catch (error) {
     console.error('PAGE: Error calling listFilesFromR2 directly:', error);
-    // Return empty array to prevent breaking the page, error is logged
     return [];
   }
 }
 
 export default async function HomePage() {
-  // Call the direct function instead of the one using fetch
   const files = await getFilesDirectly();
-
-  console.log(process.env.NEXT_PUBLIC_R2_URL, 'NEXT_PUBLIC_R2_URL');
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -38,17 +25,12 @@ export default async function HomePage() {
       <main>
         {files.length === 0 ? (
           <div className="flex h-64 items-center justify-center rounded-lg border-2 border-gray-300 border-dashed">
-            {/* Update empty state message if desired */}
             <p className="text-center text-gray-500">No files found or failed to load files.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {files.map((file) => (
-              <FileCard
-                key={file.name}
-                file={file} // file should now match R2ListedFile type
-                // formatBytes and formatDate are now defined within FileCard
-              />
+              <FileCard key={file.name} file={file} />
             ))}
           </div>
         )}
