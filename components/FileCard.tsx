@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import dayjs from 'dayjs';
-import { Check, Copy, Share2, Trash2 } from 'lucide-react';
+import { Check, Share2, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -63,7 +63,6 @@ function formatBytes(bytes: number, decimals = 2): string {
 export default function FileCard({ file }: FileCardProps) {
   const router = useRouter();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [urlCopied, setUrlCopied] = useState(false);
 
   const handleDeleteClick = () => {
@@ -93,20 +92,6 @@ export default function FileCard({ file }: FileCardProps) {
       throw error;
     }
   };
-
-  const copyFileName = debounce(() => {
-    navigator.clipboard
-      .writeText(file.name)
-      .then(() => {
-        setCopied(true);
-        toast.success('File name copied to clipboard');
-        setTimeout(() => setCopied(false), 2000);
-      })
-      .catch((err) => {
-        console.error('Failed to copy filename: ', err);
-        toast.error('Failed to copy filename');
-      });
-  }, 300);
 
   const copyFileURL = debounce(() => {
     const urlToCopy = `${process.env.NEXT_PUBLIC_R2_URL}/${file.name}`;
@@ -147,16 +132,6 @@ export default function FileCard({ file }: FileCardProps) {
           </p>
         </CardContent>
         <CardFooter className="flex justify-end space-x-1 pt-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={copyFileName}
-            title="Copy filename"
-            className="h-8 w-8"
-          >
-            {copied ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}
-            <span className="sr-only">Copy filename</span>
-          </Button>
           <Button
             variant="ghost"
             size="icon"

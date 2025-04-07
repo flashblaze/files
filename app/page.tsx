@@ -1,6 +1,6 @@
+import FileCard from '../components/FileCard';
+import FileUploader from '../components/FileUploader';
 import { type R2ListedFile, listFilesFromR2 } from '../lib/r2-actions';
-import FileCard from './components/FileCard';
-import FileUploader from './components/FileUploader';
 
 async function getFilesDirectly(): Promise<R2ListedFile[]> {
   try {

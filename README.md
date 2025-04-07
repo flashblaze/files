@@ -11,7 +11,7 @@ This is a simple file uploader built with Next.js, Shadcn, and Lucide.
   {
     "AllowedOrigins": [
       "http://localhost:3000",
-      "https://files.flashblaze.dev"
+      "your-custom-domain.com"
     ],
     "AllowedMethods": [
       "GET",

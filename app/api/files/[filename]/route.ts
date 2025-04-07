@@ -1,18 +1,11 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import type { NextRequest } from 'next/server';
 
-// Define the R2 Bucket interface again, focusing on delete
 interface R2Bucket {
   delete(key: string | string[]): Promise<void>;
-  // Add other methods like list, put, get if needed in this context
 }
 
-// Use 'any' for the second argument type as a workaround
-export async function DELETE(
-  _request: NextRequest,
-  context: any // Type context as 'any'
-) {
-  // Runtime check for params and filename
+export async function DELETE(_request: NextRequest, context: any) {
   const params = context?.params;
   const filename = params?.filename as string | undefined;
 
@@ -37,7 +30,6 @@ export async function DELETE(
   } catch (error) {
     console.error(`Error deleting file ${decodedFilename} from R2:`, error);
     const errorMessage = error instanceof Error ? error.message : 'Failed to delete file';
-    // Check for specific errors if needed (e.g., file not found)
     return Response.json({ error: errorMessage }, { status: 500 });
   }
 }
