@@ -1,8 +1,17 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import type { FormEvent, ChangeEvent } from 'react';
-import { X, Loader2, UploadCloud } from 'lucide-react'; // Added UploadCloud
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Progress } from '@/components/ui/progress'; // Import Progress
+import { Loader2, UploadCloud } from 'lucide-react'; // Added UploadCloud
+import { useEffect, useRef, useState } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
 
 // Type for the presigned URL API response
 interface PresignedUrlResponse {
@@ -82,6 +91,16 @@ export default function UploadModal({ isOpen, onClose, onUploadSuccess }: Upload
       setIsLoading(false);
       setStatusMessage('Upload cancelled.');
       setUploadProgress(0);
+    }
+  };
+
+  // Handle Dialog close attempt (Overlay click, Esc, X button)
+  const handleDialogClose = (open: boolean) => {
+    if (!open) {
+      if (isLoading) {
+        handleCancelUpload(); // Cancel ongoing upload if user closes dialog
+      }
+      onClose(); // Call the original onClose handler
     }
   };
 
@@ -178,26 +197,17 @@ export default function UploadModal({ isOpen, onClose, onUploadSuccess }: Upload
     // Note: finally block removed as loading state is handled differently now
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)] backdrop-blur-sm">
-      <div ref={modalRef} className="relative w-full max-w-md rounded-lg bg-white p-8 shadow-xl">
-        {/* Close Button */}
-        <button
-          type="button"
-          onClick={isLoading ? handleCancelUpload : onClose} // Allow cancel during upload
-          className="absolute top-3 right-3 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:text-gray-300"
-          aria-label={isLoading ? 'Cancel upload' : 'Close modal'}
-          // disabled={isLoading} // Allow cancelling
-        >
-          <X className="h-5 w-5" aria-hidden="true" />
-        </button>
+    <Dialog open={isOpen} onOpenChange={handleDialogClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Upload New File</DialogTitle>
+          {/* Optional: Add DialogDescription if needed */}
+          {/* <DialogDescription>Select a file and click upload.</DialogDescription> */}
+        </DialogHeader>
 
-        <h2 className="mb-6 text-center font-semibold text-gray-700 text-xl">Upload New File</h2>
-
-        {/* Use simpler form structure if only file input is needed */}
-        <div className="space-y-4">
+        {/* Form Content */}
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* File Input Area */}
           <div className="flex w-full items-center justify-center">
             <label
@@ -232,42 +242,39 @@ export default function UploadModal({ isOpen, onClose, onUploadSuccess }: Upload
           </div>
 
           {/* Progress Bar */}
-          {isLoading && uploadProgress > 0 && (
-            <div className="w-full rounded-full bg-gray-200">
-              <div
-                className="rounded-full bg-blue-600 p-0.5 text-center font-medium text-blue-100 text-xs leading-none"
-                style={{ width: `${uploadProgress}%` }}
-              >
-                {uploadProgress}%
-              </div>
-            </div>
+          {isLoading && uploadProgress >= 0 && (
+            // Use Shadcn Progress component
+            <Progress value={uploadProgress} className="h-2 w-full" />
           )}
 
-          {/* Upload/Cancel Button */}
-          <button
-            type="button" // Changed from submit as we handle logic onClick
-            onClick={isLoading ? handleCancelUpload : (e) => handleSubmit(e as any)} // Trigger submit logic or cancel
-            disabled={!file && !isLoading} // Disabled if no file selected (and not loading)
-            className={`flex w-full items-center justify-center rounded-md px-4 py-2 text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${isLoading ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'} disabled:cursor-not-allowed disabled:bg-gray-400`}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="-ml-1 mr-3 h-5 w-5 animate-spin" aria-hidden="true" />
-                <span>Cancel Upload</span>
-              </>
-            ) : (
-              <span>Upload File</span>
-            )}
-          </button>
-        </div>
+          {/* Status Message - Placed above footer */}
+          {statusMessage && (
+            <p className={`text-center text-sm ${isError ? 'text-red-600' : 'text-green-600'}`}>
+              {statusMessage}
+            </p>
+          )}
 
-        {/* Status Message */}
-        {statusMessage && (
-          <p className={`mt-4 text-center text-sm ${isError ? 'text-red-600' : 'text-green-600'}`}>
-            {statusMessage}
-          </p>
-        )}
-      </div>
-    </div>
+          {/* Footer with Action Buttons */}
+          <DialogFooter>
+            {/* Conditional Upload/Cancel Button */}
+            <Button
+              type={isLoading ? 'button' : 'submit'} // Change type based on state
+              onClick={isLoading ? handleCancelUpload : undefined} // Explicit cancel onClick
+              disabled={!file && !isLoading} // Disabled if no file selected (and not loading)
+              variant={isLoading ? 'destructive' : 'default'} // Destructive variant for Cancel
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Cancel Upload
+                </>
+              ) : (
+                'Upload File'
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
