@@ -12,17 +12,13 @@
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "lint:fix": "biome lint --write .",
     "format": "biome format .",
-    "format:fix": "biome format --write .",
-    "db:migrate": "wrangler d1 migrations apply INSTACLOCK_DB --local",
-    "db:generate": "drizzle-kit generate",
-    "db:studio": "LOCAL_DB_PATH=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) drizzle-kit studio",
-    "db:push": "drizzle-kit push"
+    "format:fix": "biome format --write ."
   },
   "dependencies": {
+    "aws4fetch": "^1.0.20",
     "better-sqlite3": "^11.9.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
-    "drizzle-orm": "^0.41.0",
     "lucide-react": "^0.487.0",
     "nanoid": "^5.1.5",
     "next": "15.2.4",
@@ -38,7 +34,6 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "drizzle-kit": "^0.30.6",
     "tailwindcss": "^4",
     "typescript": "^5",
     "wrangler": "^4.7.2"

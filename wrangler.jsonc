@@ -28,7 +28,9 @@
   ],
   "vars": {
     "NEXT_PUBLIC_URL": "https://files.flashblaze.dev",
-    "NEXT_PUBLIC_R2_URL": "https://media.flashblaze.dev"
+    "NEXT_PUBLIC_R2_URL": "https://media.flashblaze.dev",
+    "NEXT_PUBLIC_R2_ACCOUNT_ID": "bfa55805fd87330adc70a36c2fc285f2",
+    "NEXT_PUBLIC_R2_BUCKET_NAME": "flashblaze"
   }
 
   /**

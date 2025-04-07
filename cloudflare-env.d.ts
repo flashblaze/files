@@ -3,5 +3,7 @@
 
 // biome-ignore lint/correctness/noUnusedVariables: <explanation>
 interface CloudflareEnv {
-    R2_BUCKET: R2Bucket;
+  R2_BUCKET: R2Bucket;
+  NEXT_PUBLIC_R2_ACCOUNT_ID: string;
+  NEXT_PUBLIC_R2_BUCKET_NAME: string;
 }
