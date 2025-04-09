@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["./.open-next/*", "./.next/*", "./node_modules/*"]
+    "ignore": ["./worker-configuration.d.ts", "./node_modules/*", "./.wrangler/*"]
   },
   "formatter": {
     "enabled": true,
