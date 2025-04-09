@@ -5,13 +5,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "files",
-  "main": ".open-next/worker.js",
-  "compatibility_date": "2025-03-01",
-  "compatibility_flags": ["nodejs_compat"],
-  "assets": {
-    "binding": "ASSETS",
-    "directory": ".open-next/assets"
-  },
+  "compatibility_date": "2025-04-04",
+  "main": "./workers/app.ts",
   "observability": {
     "enabled": true
   },
@@ -27,10 +22,13 @@
     }
   ],
   "vars": {
-    "NEXT_PUBLIC_URL": "https://files.flashblaze.dev",
-    "NEXT_PUBLIC_R2_URL": "https://media.flashblaze.dev",
-    "NEXT_PUBLIC_R2_ACCOUNT_ID": "bfa55805fd87330adc70a36c2fc285f2",
-    "NEXT_PUBLIC_R2_BUCKET_NAME": "flashblaze"
+    "PUBLIC_URL": "https://files.flashblaze.dev",
+    "PUBLIC_R2_URL": "https://media.flashblaze.dev",
+    "PUBLIC_R2_ACCOUNT_ID": "bfa55805fd87330adc70a36c2fc285f2",
+    "PUBLIC_R2_BUCKET_NAME": "flashblaze",
+    "R2_ACCESS_KEY_ID": "",
+    "R2_SECRET_ACCESS_KEY": "",
+    "PUBLIC_MODE": "production"
   }
 
   /**

@@ -1,6 +1,6 @@
 # File Uploader
 
-This is a simple file uploader built with Next.js, Shadcn, and Lucide.
+This is a simple file uploader built with React Router, Shadcn, and Lucide.
 
 ## Getting Started
 
@@ -10,7 +10,7 @@ This is a simple file uploader built with Next.js, Shadcn, and Lucide.
 [
   {
     "AllowedOrigins": [
-      "http://localhost:3000",
+      "http://localhost:5173",
       "your-custom-domain.com"
     ],
     "AllowedMethods": [
