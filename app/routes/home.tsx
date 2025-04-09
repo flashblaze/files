@@ -4,10 +4,7 @@ import FileUploader from '~/components/FileUploader';
 import type { Route } from './+types/home';
 
 export function meta() {
-  return [
-    { title: 'New React Router App' },
-    { name: 'description', content: 'Welcome to React Router!' },
-  ];
+  return [{ title: 'File Uploader' }, { name: 'description', content: 'Share files with ease' }];
 }
 
 export async function loader({ context }: Route.LoaderArgs) {
@@ -27,7 +24,7 @@ export async function loader({ context }: Route.LoaderArgs) {
 
 export default function Home({ loaderData }: Route.ComponentProps) {
   return (
-    <div className="min-h-screen p-8">
+    <div className="container mx-auto min-h-screen p-8">
       <header className="mb-8 flex items-center justify-between border-b pb-4">
         <h1 className="font-bold text-3xl tracking-tight">Your Files</h1>
         <FileUploader />

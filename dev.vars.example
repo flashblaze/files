@@ -1,0 +1,5 @@
+PUBLIC_URL=http://localhost:5173
+PUBLIC_R2_URL=http://localhost:5173
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+PUBLIC_MODE=development

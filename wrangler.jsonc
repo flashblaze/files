@@ -26,8 +26,6 @@
     "PUBLIC_R2_URL": "https://media.flashblaze.dev",
     "PUBLIC_R2_ACCOUNT_ID": "bfa55805fd87330adc70a36c2fc285f2",
     "PUBLIC_R2_BUCKET_NAME": "flashblaze",
-    "R2_ACCESS_KEY_ID": "",
-    "R2_SECRET_ACCESS_KEY": "",
     "PUBLIC_MODE": "production",
     "PNPM_VERSION": "10.6.2"
   }

@@ -53,6 +53,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
     const expiresInSeconds = 3600;
     targetUrl.searchParams.set('X-Amz-Expires', expiresInSeconds.toString());
 
+    // This is to simulate R2 file upload in development mode
     if (env.PUBLIC_MODE === 'development') {
       // Or create an ArrayBuffer with some content
       const contentBuffer = new ArrayBuffer(8);
@@ -60,7 +61,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       view.fill(0); // Fill with zeros or any other data
 
       // Store the placeholder in R2
-      await context.cloudflare.env.R2_BUCKET.put('placeholder.txt', contentBuffer, {
+      await context.cloudflare.env.R2_BUCKET.put(`${new Date().toISOString()}.txt`, contentBuffer, {
         customMetadata: {
           type: 'placeholder',
           createdAt: new Date().toISOString(),
