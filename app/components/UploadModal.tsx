@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog';
 import { Progress } from '~/components/ui/progress';
+import { cn } from '~/lib/utils';
 
 // Type for the presigned URL API response
 interface PresignedUrlResponse {
@@ -188,9 +189,9 @@ export default function UploadModal({ isOpen, onClose, onUploadSuccess }: Upload
       console.error('Upload process error:', error);
       setStatusMessage(error instanceof Error ? error.message : 'An unknown error occurred.');
       setIsError(true);
-      setIsLoading(false); // Stop loading on error
-      setUploadProgress(0); // Reset progress on error
-      xhrRef.current = null; // Clear ref if error happened before XHR setup
+      setIsLoading(false);
+      setUploadProgress(0);
+      xhrRef.current = null;
     }
     // Note: finally block removed as loading state is handled differently now
   };
@@ -200,33 +201,34 @@ export default function UploadModal({ isOpen, onClose, onUploadSuccess }: Upload
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Upload New File</DialogTitle>
-          {/* Optional: Add DialogDescription if needed */}
-          {/* <DialogDescription>Select a file and click upload.</DialogDescription> */}
         </DialogHeader>
 
-        {/* Form Content */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* File Input Area */}
           <div className="flex w-full items-center justify-center">
             <label
               htmlFor="modalFileInput"
-              className={`flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed ${isError ? 'border-red-400 bg-red-50' : 'border-gray-300 bg-gray-50'} hover:bg-gray-100`}
+              className={cn(
+                'flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed',
+                isError && 'border-red-400'
+              )}
             >
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <UploadCloud
-                  className={`mb-3 h-8 w-8 ${isError ? 'text-red-500' : 'text-gray-400'}`}
+                  className={cn('mb-3 h-8 w-8', isError && 'text-red-500')}
                   aria-hidden="true"
                 />
                 {file ? (
-                  <p className="mb-2 text-gray-700 text-sm">
+                  <p className={cn('mb-2 text-sm', isError && 'text-red-700')}>
                     <span className="font-semibold">Selected:</span> {file.name}
                   </p>
                 ) : (
-                  <p className="mb-2 text-gray-500 text-sm">
+                  <p className={cn('mb-2 text-sm', isError && 'text-red-500')}>
                     <span className="font-semibold">Click to upload</span> or drag and drop
                   </p>
                 )}
-                <p className="text-gray-500 text-xs">Any file type, max size limited by R2/Plan</p>
+                <p className={cn('text-xs', isError && 'text-red-500')}>
+                  Any file type, max size limited by R2/Plan
+                </p>
               </div>
               <input
                 id="modalFileInput"
@@ -239,27 +241,22 @@ export default function UploadModal({ isOpen, onClose, onUploadSuccess }: Upload
             </label>
           </div>
 
-          {/* Progress Bar */}
           {isLoading && uploadProgress >= 0 && (
-            // Use Shadcn Progress component
             <Progress value={uploadProgress} className="h-2 w-full" />
           )}
 
-          {/* Status Message - Placed above footer */}
           {statusMessage && (
-            <p className={`text-center text-sm ${isError ? 'text-red-600' : 'text-green-600'}`}>
+            <p className={`text-center text-sm ${isError ? 'text-red-400' : 'text-green-400'}`}>
               {statusMessage}
             </p>
           )}
 
-          {/* Footer with Action Buttons */}
           <DialogFooter>
-            {/* Conditional Upload/Cancel Button */}
             <Button
-              type={isLoading ? 'button' : 'submit'} // Change type based on state
-              onClick={isLoading ? handleCancelUpload : undefined} // Explicit cancel onClick
-              disabled={!file && !isLoading} // Disabled if no file selected (and not loading)
-              variant={isLoading ? 'destructive' : 'default'} // Destructive variant for Cancel
+              type={isLoading ? 'button' : 'submit'}
+              onClick={isLoading ? handleCancelUpload : undefined}
+              disabled={!file && !isLoading}
+              variant={isLoading ? 'destructive' : 'default'}
             >
               {isLoading ? (
                 <>

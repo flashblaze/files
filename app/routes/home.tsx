@@ -27,9 +27,9 @@ export async function loader({ context }: Route.LoaderArgs) {
 
 export default function Home({ loaderData }: Route.ComponentProps) {
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <header className="mb-8 flex items-center justify-between border-gray-200 border-b pb-4">
-        <h1 className="font-bold text-3xl text-gray-900 tracking-tight">Your Files</h1>
+    <div className="min-h-screen p-8">
+      <header className="mb-8 flex items-center justify-between border-b pb-4">
+        <h1 className="font-bold text-3xl tracking-tight">Your Files</h1>
         <FileUploader />
       </header>
 
