@@ -28,7 +28,8 @@
     "PUBLIC_R2_BUCKET_NAME": "flashblaze",
     "R2_ACCESS_KEY_ID": "",
     "R2_SECRET_ACCESS_KEY": "",
-    "PUBLIC_MODE": "production"
+    "PUBLIC_MODE": "production",
+    "PNPM_VERSION": "10.6.2"
   }
 
   /**
