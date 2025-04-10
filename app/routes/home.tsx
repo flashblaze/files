@@ -26,7 +26,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <div className="container mx-auto min-h-screen p-8">
       <header className="mb-8 flex items-center justify-between border-b pb-4">
-        <h1 className="font-bold text-3xl tracking-tight">Your Files</h1>
+        <h1 className="font-bold text-2xl tracking-tight">Your Files</h1>
         <FileUploader />
       </header>
 

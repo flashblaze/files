@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Check, Share2, Trash2, Wind } from 'lucide-react';
+import { Check, Share2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -14,7 +14,6 @@ import {
 } from '~/components/ui/card';
 
 import DeleteConfirmationModal from './DeleteConfirmationModal';
-import GenerateTempUrlModal from './GenerateTempUrlModal';
 
 interface R2File {
   name: string;
@@ -63,7 +62,6 @@ function formatBytes(bytes: number, decimals = 2): string {
 export default function FileCard({ file, publicR2Url }: FileCardProps) {
   const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isTempUrlModalOpen, setIsTempUrlModalOpen] = useState(false);
   const [urlCopied, setUrlCopied] = useState(false);
 
   const handleDeleteClick = () => {
@@ -72,14 +70,6 @@ export default function FileCard({ file, publicR2Url }: FileCardProps) {
 
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
-  };
-
-  const handleOpenTempUrlModal = () => {
-    setIsTempUrlModalOpen(true);
-  };
-
-  const handleCloseTempUrlModal = () => {
-    setIsTempUrlModalOpen(false);
   };
 
   const handleConfirmDelete = async () => {
@@ -144,16 +134,6 @@ export default function FileCard({ file, publicR2Url }: FileCardProps) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={handleOpenTempUrlModal}
-            title="Generate temporary URL"
-            className="h-8 w-8"
-          >
-            <Wind size={16} />
-            <span className="sr-only">Generate temporary URL</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
             onClick={copyFileURL}
             title="Share file (copies URL)"
             className="h-8 w-8"
@@ -178,12 +158,6 @@ export default function FileCard({ file, publicR2Url }: FileCardProps) {
         isOpen={isDeleteModalOpen}
         onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
-        fileName={file.name}
-      />
-
-      <GenerateTempUrlModal
-        isOpen={isTempUrlModalOpen}
-        onClose={handleCloseTempUrlModal}
         fileName={file.name}
       />
     </>

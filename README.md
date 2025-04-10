@@ -34,3 +34,7 @@ This is a simple file uploader built with React Router, Shadcn (themed via [twea
 6. Install dependencies via `pnpm i`
 7. Run the development server via `pnpm dev`
 8. Put the main domain behind Cloudflare Access so you only can access and you're good to go!
+
+## Deploying
+
+Add `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` to **Variables and Secrets** with type set to **Secret**
