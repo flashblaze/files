@@ -73,7 +73,6 @@ export async function action({ request, context }: ActionFunctionArgs) {
       method: 'PUT',
       headers: {
         'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=86400',
       },
       aws: { signQuery: true },
     });
