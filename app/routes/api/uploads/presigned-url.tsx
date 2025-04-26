@@ -7,6 +7,13 @@ interface PresignedUrlRequestBody {
   contentType: string;
 }
 
+/**
+ * Sanitizes a filename by replacing spaces and special characters with underscores
+ */
+function sanitizeFilename(filename: string): string {
+  return filename.replace(/[^a-zA-Z0-9.]/g, '_');
+}
+
 export async function action({ request, context }: ActionFunctionArgs) {
   let requestBody: PresignedUrlRequestBody;
   try {
@@ -28,7 +35,9 @@ export async function action({ request, context }: ActionFunctionArgs) {
     return Response.json({ error: 'Missing or invalid filename/contentType' }, { status: 400 });
   }
 
-  const objectKey = filename;
+  // Sanitize the filename
+  const sanitizedFilename = sanitizeFilename(filename);
+  const objectKey = sanitizedFilename;
 
   try {
     if (
@@ -79,7 +88,12 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
     const presignedUrl = signedRequest.url;
 
-    return Response.json({ url: presignedUrl, method: 'PUT' });
+    return Response.json({
+      url: presignedUrl,
+      method: 'PUT',
+      originalFilename: filename,
+      sanitizedFilename: sanitizedFilename,
+    });
   } catch (error) {
     console.error(
       `API AWS4FETCH PRESIGNED: Error generating pre-signed URL for ${objectKey}:`,
