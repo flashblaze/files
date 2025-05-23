@@ -19,7 +19,14 @@ export async function loader({ context }: Route.LoaderArgs) {
     uploaded: obj.uploaded?.toISOString(), // Ensure date is ISO string
   }));
 
-  return { files, publicR2Url: env.PUBLIC_R2_URL };
+  // Sort files by upload date in descending order (newest first)
+  const sortedFiles = files.sort((a, b) => {
+    const dateA = new Date(a.uploaded || 0);
+    const dateB = new Date(b.uploaded || 0);
+    return dateB.getTime() - dateA.getTime(); // Descending order
+  });
+
+  return { files: sortedFiles, publicR2Url: env.PUBLIC_R2_URL };
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
